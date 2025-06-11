@@ -9,20 +9,12 @@ jobs:
     runs-on: ubuntu-latest
     steps:
       - uses: actions/checkout@v3
-      - name: Set up Python
-        uses: actions/setup-python@v4
-        with:
-          python-version: '3.11'
       - name: Set up Go
         uses: actions/setup-go@v4
         with:
           go-version: '1.21'
-      - name: Install dependencies
-        run: |
-          pip install -r requirements.txt
       - name: Run tests
         run: |
-          pytest
           cd backend && go test ./...
 
   deploy:
@@ -38,18 +30,18 @@ jobs:
           registry: ${{ secrets.REGISTRY_URL }}
           username: ${{ secrets.REGISTRY_USERNAME }}
           password: ${{ secrets.REGISTRY_PASSWORD }}
-      - name: Build and push API
+      - name: Build and push backend
         uses: docker/build-push-action@v4
         with:
-          context: .
+          context: ./backend
           push: true
-          tags: ${{ secrets.REGISTRY_URL }}/eventoria/api:latest
-      - name: Build and push frontend
+          tags: ${{ secrets.REGISTRY_URL }}/eventoria/go-api:latest
+      - name: Build and push flutter web
         uses: docker/build-push-action@v4
         with:
-          context: ./frontend
+          context: ./frontend_flutter
           push: true
-          tags: ${{ secrets.REGISTRY_URL }}/eventoria/frontend:latest
+          tags: ${{ secrets.REGISTRY_URL }}/eventoria/flutter-web:latest
       - name: Deploy on server
         uses: appleboy/ssh-action@v1.0.0
         with:
@@ -57,6 +49,6 @@ jobs:
           username: ${{ secrets.SSH_USER }}
           key: ${{ secrets.SSH_PRIVATE_KEY }}
           script: |
-            docker pull ${{ secrets.REGISTRY_URL }}/eventoria/api:latest
-            docker pull ${{ secrets.REGISTRY_URL }}/eventoria/frontend:latest
+            docker pull ${{ secrets.REGISTRY_URL }}/eventoria/go-api:latest
+            docker pull ${{ secrets.REGISTRY_URL }}/eventoria/flutter-web:latest
             docker compose -f /path/to/docker-compose.yml up -d
