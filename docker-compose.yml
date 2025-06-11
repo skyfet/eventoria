@@ -19,6 +19,18 @@ services:
       sign-mock:
         condition: service_started
 
+  go-api:
+    build: ./backend
+    ports:
+      - "8080:8080"
+    depends_on:
+      db:
+        condition: service_healthy
+      minio:
+        condition: service_started
+      sign-mock:
+        condition: service_started
+
   db:
     image: postgres:15
     environment:
@@ -55,4 +67,12 @@ services:
     - "3000:80"
     depends_on:
       api:
+        condition: service_started
+
+  flutter-web:
+    build: ./frontend_flutter
+    ports:
+      - "8081:80"
+    depends_on:
+      go-api:
         condition: service_started
