@@ -1,0 +1,9 @@
+name: eventoria
+packages:
+  - frontend_flutter
+
+scripts:
+  build-web:
+    run: fvm flutter build web --dart-define=API_BASE=http://localhost:8080
+    packageFilters:
+      dirExists: web
