@@ -1,0 +1,7 @@
+name: eventoria_workspace
+packages:
+  - frontend_flutter
+scripts:
+  build:
+    run: flutter build web
+    exec: frontend_flutter
