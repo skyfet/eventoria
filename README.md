@@ -23,14 +23,16 @@ cd backend && go test ./...
 ## Melos Workspace
 
 The Flutter frontend is managed using [melos](https://melos.invertase.dev/).
-Install melos (`flutter pub global activate melos`) then bootstrap packages:
+Flutter itself is versioned with [FVM](https://fvm.app/) and this project
+uses Flutter **3.32.2**. Install FVM and melos (`dart pub global activate fvm`
+and `flutter pub global activate melos`), then bootstrap packages:
 
 ```bash
 melos bootstrap
 ```
 
-The `build-web` script can be executed via `melos run build-web` to create a web
-release build of the frontend.
+The `build-web` script uses FVM internally and can be executed via
+`melos run build-web` to create a web release build of the frontend.
 
 
 This project is licensed under the MIT License. See [LICENSE](LICENSE) for

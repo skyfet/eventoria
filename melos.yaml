@@ -4,6 +4,6 @@ packages:
 
 scripts:
   build-web:
-    run: flutter build web --dart-define=API_BASE=http://localhost:8080
+    run: fvm flutter build web --dart-define=API_BASE=http://localhost:8080
     packageFilters:
       dirExists: web
