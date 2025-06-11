@@ -19,6 +19,20 @@ Future<Map<String, dynamic>> createObject(Map<String, dynamic> data) async {
   return jsonDecode(res.body) as Map<String, dynamic>;
 }
 
+Future<void> updateObject(int id, Map<String, dynamic> data) async {
+  final res = await http.put(
+    Uri.parse('$baseUrl/objects/$id'),
+    headers: {'Content-Type': 'application/json'},
+    body: jsonEncode(data),
+  );
+  if (res.statusCode != 200) throw Exception('Failed to update object');
+}
+
+Future<void> deleteObject(int id) async {
+  final res = await http.delete(Uri.parse('$baseUrl/objects/$id'));
+  if (res.statusCode != 204) throw Exception('Failed to delete object');
+}
+
 Future<List<dynamic>> fetchWorkLogs() async {
   final res = await http.get(Uri.parse('$baseUrl/worklogs'));
   if (res.statusCode != 200) throw Exception('Failed to load worklogs');
@@ -33,4 +47,18 @@ Future<Map<String, dynamic>> createWorkLog(Map<String, dynamic> data) async {
   );
   if (res.statusCode != 201) throw Exception('Failed to create worklog');
   return jsonDecode(res.body) as Map<String, dynamic>;
+}
+
+Future<void> updateWorkLog(int id, Map<String, dynamic> data) async {
+  final res = await http.put(
+    Uri.parse('$baseUrl/worklogs/$id'),
+    headers: {'Content-Type': 'application/json'},
+    body: jsonEncode(data),
+  );
+  if (res.statusCode != 200) throw Exception('Failed to update worklog');
+}
+
+Future<void> deleteWorkLog(int id) async {
+  final res = await http.delete(Uri.parse('$baseUrl/worklogs/$id'));
+  if (res.statusCode != 204) throw Exception('Failed to delete worklog');
 }
