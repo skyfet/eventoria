@@ -6,3 +6,4 @@ asyncpg==0.29.0
 alembic==1.13.1
 python-multipart==0.0.7
 boto3==1.34.96
+httpx==0.27.0
