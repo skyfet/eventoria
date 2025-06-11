@@ -17,7 +17,7 @@ async def create_log(
     order = await session.get(WorkOrder, payload.work_order_id)
     if not order:
         raise HTTPException(status_code=404, detail="Work order not found")
-    log = WorkLog(**payload.dict())
+    log = WorkLog(**payload.model_dump(exclude_none=True))
     session.add(log)
     await session.commit()
     await session.refresh(log)

@@ -9,7 +9,7 @@ router = APIRouter(prefix="/objects", tags=["objects"])
 
 @router.post("/", response_model=ObjectRead, status_code=status.HTTP_201_CREATED)
 async def create_object(payload: ObjectCreate, session: AsyncSession = Depends(get_session)):
-    obj = Object.from_orm(payload)
+    obj = Object.model_validate(payload)
     session.add(obj)
     await session.commit()
     await session.refresh(obj)

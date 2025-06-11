@@ -2,6 +2,8 @@
 import React, { useState, useEffect } from 'react'
 import { TextField, Button, List, ListItem, ListItemText, Paper, Stack } from '@mui/material'
 
+const API_BASE = import.meta.env.VITE_API_BASE || 'http://localhost:8000'
+
 interface Log {
   id: number
   description: string
@@ -17,7 +19,7 @@ export default function WorklogsPage() {
   const [description, setDescription] = useState('')
 
   const load = async () => {
-    const l = await fetch('http://localhost:8000/worklogs').then(r => r.json())
+    const l = await fetch(`${API_BASE}/worklogs`).then(r => r.json())
     setLogs(l)
   }
 
@@ -25,7 +27,7 @@ export default function WorklogsPage() {
 
   const add = async () => {
     if(!workOrderId || !performerId) return
-    await fetch('http://localhost:8000/worklogs', {
+    await fetch(`${API_BASE}/worklogs`, {
       method: 'POST',
       headers: { 'Content-Type': 'application/json' },
       body: JSON.stringify({

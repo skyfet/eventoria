@@ -2,6 +2,8 @@
 import React, { useState, useEffect } from 'react'
 import { TextField, Button, List, ListItem, ListItemText, Paper, Stack } from '@mui/material'
 
+const API_BASE = import.meta.env.VITE_API_BASE || 'http://localhost:8000'
+
 interface Obj { id: number; name: string; address: string }
 
 export default function ObjectsPage() {
@@ -10,14 +12,14 @@ export default function ObjectsPage() {
   const [address, setAddress] = useState('')
 
   const load = async () => {
-    const r = await fetch('http://localhost:8000/objects')
+    const r = await fetch(`${API_BASE}/objects`)
     setObjects(await r.json())
   }
 
   useEffect(() => { load() }, [])
 
   const add = async () => {
-    await fetch('http://localhost:8000/objects', {
+    await fetch(`${API_BASE}/objects`, {
       method: 'POST',
       headers: { 'Content-Type': 'application/json' },
       body: JSON.stringify({ name, address })
