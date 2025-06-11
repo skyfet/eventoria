@@ -52,6 +52,53 @@ class _ObjectsPageState extends State<ObjectsPage> {
     );
   }
 
+  Future<void> _editObject(Map<String, dynamic> obj) async {
+    final nameCtrl = TextEditingController(text: obj['name']);
+    final addrCtrl = TextEditingController(text: obj['address']);
+    await showDialog(
+      context: context,
+      builder: (context) => AlertDialog(
+        title: const Text('Edit Object'),
+        content: Column(
+          mainAxisSize: MainAxisSize.min,
+          children: [
+            TextField(controller: nameCtrl, decoration: const InputDecoration(labelText: 'Name')),
+            TextField(controller: addrCtrl, decoration: const InputDecoration(labelText: 'Address')),
+          ],
+        ),
+        actions: [
+          TextButton(onPressed: () => Navigator.pop(context), child: const Text('Cancel')),
+          ElevatedButton(
+            onPressed: () async {
+              await updateObject(obj['id'] as int, {'name': nameCtrl.text, 'address': addrCtrl.text});
+              Navigator.pop(context);
+              _refresh();
+            },
+            child: const Text('Save'),
+          ),
+        ],
+      ),
+    );
+  }
+
+  Future<void> _deleteObject(int id) async {
+    final confirmed = await showDialog<bool>(
+      context: context,
+      builder: (context) => AlertDialog(
+        title: const Text('Delete Object?'),
+        content: const Text('This action cannot be undone'),
+        actions: [
+          TextButton(onPressed: () => Navigator.pop(context, false), child: const Text('Cancel')),
+          ElevatedButton(onPressed: () => Navigator.pop(context, true), child: const Text('Delete')),
+        ],
+      ),
+    );
+    if (confirmed == true) {
+      await deleteObject(id);
+      _refresh();
+    }
+  }
+
   @override
   Widget build(BuildContext context) {
     return Scaffold(
@@ -74,6 +121,19 @@ class _ObjectsPageState extends State<ObjectsPage> {
               return ListTile(
                 title: Text(o['name']),
                 subtitle: Text(o['address']),
+                trailing: Wrap(
+                  spacing: 8,
+                  children: [
+                    IconButton(
+                      icon: const Icon(Icons.edit),
+                      onPressed: () => _editObject(o),
+                    ),
+                    IconButton(
+                      icon: const Icon(Icons.delete),
+                      onPressed: () => _deleteObject(o['id'] as int),
+                    ),
+                  ],
+                ),
               );
             },
           );
