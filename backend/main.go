@@ -2,6 +2,7 @@ package main
 
 import (
 	"net/http"
+	"os"
 	"time"
 
 	"github.com/gin-gonic/gin"
@@ -33,7 +34,11 @@ type WorkLog struct {
 }
 
 func setupDB() *gorm.DB {
-	db, err := gorm.Open(sqlite.Open("data.db"), &gorm.Config{})
+	path := os.Getenv("DATABASE_PATH")
+	if path == "" {
+		path = "data.db"
+	}
+	db, err := gorm.Open(sqlite.Open(path), &gorm.Config{})
 	if err != nil {
 		panic(err)
 	}
@@ -43,8 +48,7 @@ func setupDB() *gorm.DB {
 	return db
 }
 
-func main() {
-	db := setupDB()
+func setupRouter(db *gorm.DB) *gin.Engine {
 	r := gin.Default()
 
 	r.GET("/", func(c *gin.Context) {
@@ -72,6 +76,37 @@ func main() {
 		}
 		c.JSON(http.StatusOK, list)
 	})
+	r.GET("/objects/:id", func(c *gin.Context) {
+		var o Object
+		if err := db.First(&o, c.Param("id")).Error; err != nil {
+			c.JSON(http.StatusNotFound, gin.H{"error": "object not found"})
+			return
+		}
+		c.JSON(http.StatusOK, o)
+	})
+	r.PUT("/objects/:id", func(c *gin.Context) {
+		var o Object
+		if err := db.First(&o, c.Param("id")).Error; err != nil {
+			c.JSON(http.StatusNotFound, gin.H{"error": "object not found"})
+			return
+		}
+		if err := c.ShouldBindJSON(&o); err != nil {
+			c.JSON(http.StatusBadRequest, gin.H{"error": err.Error()})
+			return
+		}
+		if err := db.Save(&o).Error; err != nil {
+			c.JSON(http.StatusInternalServerError, gin.H{"error": err.Error()})
+			return
+		}
+		c.JSON(http.StatusOK, o)
+	})
+	r.DELETE("/objects/:id", func(c *gin.Context) {
+		if err := db.Delete(&Object{}, c.Param("id")).Error; err != nil {
+			c.JSON(http.StatusInternalServerError, gin.H{"error": err.Error()})
+			return
+		}
+		c.Status(http.StatusNoContent)
+	})
 
 	// Work orders (minimal)
 	r.POST("/workorders", func(c *gin.Context) {
@@ -96,6 +131,37 @@ func main() {
 			return
 		}
 		c.JSON(http.StatusOK, list)
+	})
+	r.GET("/workorders/:id", func(c *gin.Context) {
+		var o WorkOrder
+		if err := db.First(&o, c.Param("id")).Error; err != nil {
+			c.JSON(http.StatusNotFound, gin.H{"error": "work order not found"})
+			return
+		}
+		c.JSON(http.StatusOK, o)
+	})
+	r.PUT("/workorders/:id", func(c *gin.Context) {
+		var o WorkOrder
+		if err := db.First(&o, c.Param("id")).Error; err != nil {
+			c.JSON(http.StatusNotFound, gin.H{"error": "work order not found"})
+			return
+		}
+		if err := c.ShouldBindJSON(&o); err != nil {
+			c.JSON(http.StatusBadRequest, gin.H{"error": err.Error()})
+			return
+		}
+		if err := db.Save(&o).Error; err != nil {
+			c.JSON(http.StatusInternalServerError, gin.H{"error": err.Error()})
+			return
+		}
+		c.JSON(http.StatusOK, o)
+	})
+	r.DELETE("/workorders/:id", func(c *gin.Context) {
+		if err := db.Delete(&WorkOrder{}, c.Param("id")).Error; err != nil {
+			c.JSON(http.StatusInternalServerError, gin.H{"error": err.Error()})
+			return
+		}
+		c.Status(http.StatusNoContent)
 	})
 
 	// Work logs
@@ -127,6 +193,46 @@ func main() {
 		}
 		c.JSON(http.StatusOK, list)
 	})
+	r.GET("/worklogs/:id", func(c *gin.Context) {
+		var wl WorkLog
+		if err := db.First(&wl, c.Param("id")).Error; err != nil {
+			c.JSON(http.StatusNotFound, gin.H{"error": "work log not found"})
+			return
+		}
+		c.JSON(http.StatusOK, wl)
+	})
+	r.PUT("/worklogs/:id", func(c *gin.Context) {
+		var wl WorkLog
+		if err := db.First(&wl, c.Param("id")).Error; err != nil {
+			c.JSON(http.StatusNotFound, gin.H{"error": "work log not found"})
+			return
+		}
+		if err := c.ShouldBindJSON(&wl); err != nil {
+			c.JSON(http.StatusBadRequest, gin.H{"error": err.Error()})
+			return
+		}
+		if err := db.Save(&wl).Error; err != nil {
+			c.JSON(http.StatusInternalServerError, gin.H{"error": err.Error()})
+			return
+		}
+		c.JSON(http.StatusOK, wl)
+	})
+	r.DELETE("/worklogs/:id", func(c *gin.Context) {
+		if err := db.Delete(&WorkLog{}, c.Param("id")).Error; err != nil {
+			c.JSON(http.StatusInternalServerError, gin.H{"error": err.Error()})
+			return
+		}
+		c.Status(http.StatusNoContent)
+	})
+	return r
+}
 
-	r.Run(":8080")
+func main() {
+	db := setupDB()
+	r := setupRouter(db)
+	port := os.Getenv("PORT")
+	if port == "" {
+		port = "8080"
+	}
+	r.Run(":" + port)
 }
