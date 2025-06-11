@@ -1,26 +1,18 @@
 # Eventoria
 
-This repository contains a minimal maintenance management prototype.
+A minimal maintenance management prototype consisting of a Go backend and a Flutter web client.
 
 ## Services
 
-- **FastAPI backend** (`api` service) – existing Python service serving REST
-  endpoints for objects and work logs.
 - **Go backend** (`go-api` service) – simple Gin/GORM API in `backend/`.
-- **React frontend** (`frontend` service) – existing web UI.
-- **Flutter frontend** (`flutter-web` service) – Flutter web app in
-  `frontend_flutter/`.
+- **Flutter frontend** (`flutter-web` service) – Flutter web app in `frontend_flutter/` managed via [melos](https://melos.invertase.dev/).
 
-The React app expects an `VITE_API_BASE` environment variable at build time to
-configure the API endpoint (defaults to `http://localhost:8000`).
-
-The project can be started locally via Docker Compose:
+Start the stack locally with Docker Compose:
 
 ```bash
 docker-compose up --build
 ```
 
-Run unit tests with `pytest`.
+After cloning run `melos bootstrap` to install Flutter dependencies. The Flutter app can then be launched with `melos exec -- flutter run -d chrome`.
 
-This project is licensed under the MIT License. See [LICENSE](LICENSE) for
-details.
+This project is licensed under the MIT License. See [LICENSE](LICENSE) for details.

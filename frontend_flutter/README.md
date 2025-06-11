@@ -1,15 +1,24 @@
 # Flutter Frontend
 
-This directory contains the Flutter web client. The application shows
-object and work log lists and allows creating, editing and deleting them.
+This directory contains the Flutter web client managed by [melos](https://melos.invertase.dev/).
 
-To run locally you need Flutter SDK installed. Then execute:
+Install Flutter and melos globally:
 
 ```bash
-flutter run -d chrome
+dart pub global activate melos
+melos bootstrap
 ```
 
-For production builds the provided Dockerfile compiles the web assets.
+Run the app locally with:
 
-The API endpoint can be configured via the `API_BASE` compile-time constant,
-e.g. `flutter build web --dart-define=API_BASE=http://localhost:8080`.
+```bash
+melos exec -- flutter run -d chrome
+```
+
+For production builds the provided Dockerfile compiles the web assets. You can also run
+
+```bash
+melos run build -- --dart-define=API_BASE=http://localhost:8080
+```
+
+The API endpoint is passed via the `API_BASE` compile-time constant.
